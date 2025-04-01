@@ -1,0 +1,25 @@
+name: Needs info labeler
+on:
+  issues:
+    types:
+      - labeled
+jobs:
+  add-comment:
+    if: github.event.label.name == 'needs-info'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Add comment
+        run: gh issue comment "$NUMBER" --body "$BODY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          BODY: >
+            A reviewer has determined we need more information to understand
+            the reported issue.  A comment on what is missing should be provided, but
+            in general it could be lack of a reproducer, incomplete environment information
+            like `podman info`, or a question has been asked to the submitter.
+            If no response to the needs-info is provided in 30 days, this issue may be
+            clean by our stale bot.
